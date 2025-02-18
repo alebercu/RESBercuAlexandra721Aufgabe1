@@ -24,6 +24,8 @@ public class Main {
 
         System.out.println(getGalaktischKampfbyDate(games));
 
+        writeKampfByKategorie(games,"/Users/alexandrabercu/IdeaProjects/RESbercualexandra721/bericht_konfrontationen.txt");
+
     }
 
     public static List<Kampf> readTsv(String filePath) {
@@ -73,6 +75,30 @@ public class Main {
                 .collect(Collectors.toList());
 
     }
+
+    public static void writeKampfByKategorie(List<Kampf> games, String outputFilePath) {
+        // Count games per city
+        Map<Konfrontationstyp, Long> cityGameCount = games.stream()
+                .collect(Collectors.groupingBy(Kampf::getTyp, Collectors.counting()));
+
+        // Sort: first by count (descending), then alphabetically by city name
+        List<Map.Entry<Konfrontationstyp, Long>> sortedCities = cityGameCount.entrySet().stream()
+                .sorted((Comparator<? super Map.Entry<Konfrontationstyp, Long>>) Comparator.comparing(Map.Entry<Konfrontationstyp, Long>::getValue).reversed()
+                                .thenComparing(Map.Entry::getKey)).toList();
+
+
+        // Write to file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath))) {
+            for (Map.Entry<Konfrontationstyp, Long> entry : sortedCities) {
+                writer.write(entry.getKey() + "%" + entry.getValue());
+                writer.newLine();
+            }
+            System.out.println("written to " + outputFilePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
 
 }
 
