@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 public class Main {
     public static void main(String[] args) {
         String tsvFilePath = "/Users/alexandrabercu/IdeaProjects/RESbercualexandra721/marvel_konfrontationen.tsv"; // Ensure this file exists
@@ -19,7 +20,9 @@ public class Main {
         // Display games with capacity >= 70000
         int minCapacity = 500;
         System.out.println("\n >= " + minCapacity + ":");
-        displayKampfByMinGlobalerEinfluss(games, minCapacity);
+        //displayKampfByMinGlobalerEinfluss(games, minCapacity);
+
+        System.out.println(getGalaktischKampfbyDate(games));
 
     }
 
@@ -61,5 +64,15 @@ public class Main {
         games.stream()
                 .filter(g -> g.getGlobalerEinfluss() >= minCapacity)
                 .forEach(System.out::println);
-    }}
+    }
+
+    public static List<Kampf> getGalaktischKampfbyDate(List<Kampf> games) {
+        String Typ = Konfrontationstyp.valueOf("Galaktisch").toString();
+        return (List<Kampf>) games.stream()
+                .filter(game -> game.getTyp().toString().equals(Typ))
+                .collect(Collectors.toList());
+
+    }
+
+}
 
