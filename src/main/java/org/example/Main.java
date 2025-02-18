@@ -1,17 +1,65 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import org.example.Kampf;
+
+import java.io.*;
+import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        String tsvFilePath = "/Users/alexandrabercu/IdeaProjects/RESbercualexandra721/marvel_konfrontationen.tsv"; // Ensure this file exists
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        List<Kampf> games = readTsv(tsvFilePath);
+        System.out.println("Total games found: " + games.size());
+
+        // Display games with capacity >= 70000
+        int minCapacity = 500;
+        System.out.println("\n >= " + minCapacity + ":");
+        displayKampfByMinGlobalerEinfluss(games, minCapacity);
+
     }
-}
+
+    public static List<Kampf> readTsv(String filePath) {
+        List<Kampf> games = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(filePath));
+
+            // Skip the first line (headers)
+            for (int i = 1; i < lines.size(); i++) {
+                String[] fields = lines.get(i).split("\t");
+
+                if (fields.length < 6) {
+                    System.err.println("Skipping invalid row: " + lines.get(i));
+                    continue;
+                }
+
+                try {
+                    int id = Integer.parseInt(fields[0]); // Id
+                    String Held = fields[1];             // Team1
+                    String Antagonist = fields[2];             // Team2
+                    Konfrontationstyp typ = Konfrontationstyp.valueOf(fields[3]);             // Datum
+                    String ort = fields[4];
+                    LocalDate datum = LocalDate.parse(fields[5]);
+                    double GlobalerEinfluss = Double.parseDouble(fields[6]);// Kapazität
+
+                    games.add(new Kampf(id, Held, Antagonist,typ, ort, datum, GlobalerEinfluss));
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid number format in row: " + lines.get(i));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading TSV file: " + e.getMessage());
+        }
+        return games;
+    }
+
+    public static void displayKampfByMinGlobalerEinfluss(List<Kampf> games, int minCapacity) {
+        games.stream()
+                .filter(g -> g.getGlobalerEinfluss() >= minCapacity)
+                .forEach(System.out::println);
+    }}
+
