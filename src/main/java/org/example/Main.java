@@ -20,7 +20,7 @@ public class Main {
         // Display games with capacity >= 70000
         int minCapacity = 500;
         System.out.println("\n >= " + minCapacity + ":");
-        //displayKampfByMinGlobalerEinfluss(games, minCapacity);
+        displayKampfByMinGlobalerEinfluss(games, minCapacity);
 
         System.out.println(getGalaktischKampfbyDate(games));
 
